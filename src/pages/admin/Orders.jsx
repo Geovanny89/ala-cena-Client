@@ -126,7 +126,7 @@ const Orders = () => {
                     <td style={{ textAlign: 'center' }}>
                       {order.receiptUrl ? (
                         <a
-                          href={`https://ala-cena-api.onrender.com/${order.receiptUrl}`}
+                          href={`https://ala-cena-api.onrender.com${order.receiptUrl}`}
                           target="_blank"
                           rel="noreferrer"
                           className="btn btn-secondary btn-sm"
