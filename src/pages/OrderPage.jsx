@@ -103,6 +103,11 @@ const OrderPage = () => {
       fd.append('receipt', receipt);
       await orderService.uploadReceipt(createdOrder.id, fd);
       setReceiptSent(true);
+      
+      // Close automatically after 3 seconds
+      setTimeout(() => {
+        handleDoneModal();
+      }, 3000);
     } catch (err) {
       setReceiptError(err.response?.data?.message || 'Error al subir el comprobante');
     } finally {
@@ -117,6 +122,23 @@ const OrderPage = () => {
 
   if (loading) return <div className="spinner"></div>;
   if (!combo) return null;
+
+  if (new Date().getHours() === 9) {
+    return (
+      <div className="order-page" style={{ textAlign: 'center', paddingTop: '3rem' }}>
+        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏳</div>
+        <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+          Pedidos cerrados
+        </h2>
+        <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
+          El sistema de pedidos está cerrado de 9:00 AM a 10:00 AM para preparar las entregas.
+        </p>
+        <button id="btn-back-home" className="btn btn-primary" onClick={() => navigate('/')}>
+          ← Volver al inicio
+        </button>
+      </div>
+    );
+  }
 
   // ── Final success screen ──
   if (success) {
@@ -256,13 +278,6 @@ const OrderPage = () => {
 
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <button
-                    className="btn btn-secondary"
-                    style={{ flex: 1 }}
-                    onClick={handleDoneModal}
-                  >
-                    Enviaré después
-                  </button>
-                  <button
                     id="btn-send-receipt"
                     className="btn btn-primary"
                     style={{ flex: 2 }}
@@ -279,9 +294,7 @@ const OrderPage = () => {
                 <p style={{ fontWeight: 700, color: 'var(--color-success)', marginBottom: '1rem' }}>
                   ¡Comprobante enviado! Estamos verificando tu pago.
                 </p>
-                <button className="btn btn-primary" style={{ width: '100%' }} onClick={handleDoneModal}>
-                  Ver mi código de pedido
-                </button>
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Cargando tu código de retiro...</p>
               </div>
             )}
           </div>

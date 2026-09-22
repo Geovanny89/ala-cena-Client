@@ -7,6 +7,7 @@ const PizzaFlavors = () => {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: '', description: '' });
+  const [imageFile, setImageFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -27,6 +28,7 @@ const PizzaFlavors = () => {
   const openCreate = () => {
     setEditing(null);
     setForm({ name: '', description: '' });
+    setImageFile(null);
     setError('');
     setShowModal(true);
   };
@@ -34,6 +36,7 @@ const PizzaFlavors = () => {
   const openEdit = (flavor) => {
     setEditing(flavor);
     setForm({ name: flavor.name, description: flavor.description || '' });
+    setImageFile(null);
     setError('');
     setShowModal(true);
   };
@@ -43,11 +46,16 @@ const PizzaFlavors = () => {
     setError('');
     setSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('description', form.description);
+      if (imageFile) formData.append('image', imageFile);
+
       if (editing) {
-        await pizzaFlavorService.update(editing.id, form);
+        await pizzaFlavorService.update(editing.id, formData);
         setSuccess('Sabor actualizado correctamente');
       } else {
-        await pizzaFlavorService.create(form);
+        await pizzaFlavorService.create(formData);
         setSuccess('Sabor creado correctamente');
       }
       setShowModal(false);
@@ -119,7 +127,15 @@ const PizzaFlavors = () => {
               ) : (
                 flavors.map((flavor) => (
                   <tr key={flavor.id}>
-                    <td style={{ fontWeight: 600 }}>🍕 {flavor.name}</td>
+                    <td style={{ fontWeight: 600 }}>
+                      {flavor.imageUrl ? (
+                        <img src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${flavor.imageUrl}`}
+                          alt={flavor.name}
+                          style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', marginRight: '0.5rem', verticalAlign: 'middle' }}
+                        />
+                      ) : '🍕 '}
+                      {flavor.name}
+                    </td>
                     <td style={{ color: 'var(--color-text-muted)' }}>{flavor.description || '—'}</td>
                     <td>
                       <span className={`badge ${flavor.isActive ? 'badge-success' : 'badge-muted'}`}>
@@ -192,6 +208,24 @@ const PizzaFlavors = () => {
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows="3"
                 />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Imagen de la pizza (opcional)</label>
+                {editing?.imageUrl && !imageFile && (
+                  <img
+                    src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${editing.imageUrl}`}
+                    alt="Imagen actual"
+                    style={{ width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.5rem' }}
+                  />
+                )}
+                <input
+                  id="modal-pizza-image"
+                  type="file"
+                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  className="form-control"
+                  onChange={(e) => setImageFile(e.target.files[0])}
+                />
+                <small style={{ color: 'var(--color-text-muted)' }}>JPG, PNG o WEBP · Máx. 5MB</small>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>

@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await authService.login({ email, password });
-      console.log(" Soy el usuario", res.data);
       const { token, user: userData } = res.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));

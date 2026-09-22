@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+import logoImg from '../assets/logo.png';
+
 const Navbar = () => {
   const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-inner">
         <NavLink to="/" className="navbar-logo" onClick={handleNavClick}>
-          🍕 Ala<span>-Cena</span>
+          <img src={logoImg} alt="Ala-Cena Logo" style={{ height: '80px', objectFit: 'contain' }} />
         </NavLink>
 
         {/* Desktop + Mobile Menu */}

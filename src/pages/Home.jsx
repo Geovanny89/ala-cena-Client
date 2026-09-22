@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { comboService } from '../api/services';
 
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
 
 const Home = () => {
   const [combos, setCombos] = useState([]);
@@ -28,9 +29,6 @@ const Home = () => {
     return 'ok';
   };
 
-  const formatPrice = (price) =>
-    new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(price);
-
   return (
     <div className="page">
       {/* Hero */}
@@ -46,7 +44,13 @@ const Home = () => {
       </div>
 
       {/* Combos */}
-      {loading ? (
+      {new Date().getHours() === 9 ? (
+        <div className="empty-state">
+          <div className="empty-state-icon">⏳</div>
+          <h3>Pedidos cerrados temporalmente</h3>
+          <p>El sistema de pedidos está cerrado de 9:00 AM a 10:00 AM para preparar las entregas. ¡Vuelve a las 10:00 AM para hacer tu pedido del día siguiente!</p>
+        </div>
+      ) : loading ? (
         <div className="spinner"></div>
       ) : combos.length === 0 ? (
         <div className="empty-state">
@@ -58,12 +62,21 @@ const Home = () => {
         <div className="card-grid">
           {combos.map((combo) => {
             const stockStatus = getStockStatus(combo.remainingQuantity);
+            const pizzaImg = combo.pizzaFlavor?.imageUrl
+              ? `${API_BASE}${combo.pizzaFlavor.imageUrl}`
+              : null;
             return (
               <div key={combo.id} className="combo-card">
                 <div className="combo-card-badge">
                   ⭐ Popular
                 </div>
-                <div className="combo-card-image">🍕</div>
+                <div className="combo-card-image">
+                  {pizzaImg ? (
+                    <img src={pizzaImg} alt={`Pizza ${combo.pizzaFlavor?.name}`} />
+                  ) : (
+                    '🍕'
+                  )}
+                </div>
                 <div className="combo-card-body">
                   <h3 className="combo-card-title">
                     Pizza {combo.pizzaFlavor?.name}
@@ -95,8 +108,39 @@ const Home = () => {
           })}
         </div>
       )}
+
+      {/* Floating WhatsApp Button */}
+      <a
+        href="https://wa.me/573507918591"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          right: '2rem',
+          backgroundColor: '#25D366',
+          color: 'white',
+          width: '60px',
+          height: '60px',
+          borderRadius: '50%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontSize: '2rem',
+          boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
+          zIndex: 1000,
+          textDecoration: 'none',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        title="Contáctanos en WhatsApp"
+      >
+        💬
+      </a>
     </div>
   );
 };
 
 export default Home;
+

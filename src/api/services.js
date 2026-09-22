@@ -8,8 +8,8 @@ export const authService = {
 
 export const pizzaFlavorService = {
   getAll: () => api.get('/pizza-flavors'),
-  create: (data) => api.post('/pizza-flavors', data),
-  update: (id, data) => api.put(`/pizza-flavors/${id}`, data),
+  create: (data) => api.post('/pizza-flavors', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, data) => api.put(`/pizza-flavors/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   remove: (id) => api.delete(`/pizza-flavors/${id}`),
 };
 
